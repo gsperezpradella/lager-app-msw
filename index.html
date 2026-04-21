@@ -323,7 +323,11 @@ window.createProj = async function() {
   var d = JSON.parse(JSON.stringify(window.lagerData));
   if (!d.projects) d.projects = [];
   d.projects.push(p); window.lagerData = d;
-  await persist(); window.closeProjForm(); window.pid = p.id; go('project');
+  await persist();
+  document.getElementById('novl').classList.remove('open');
+  document.getElementById('pname').value = '';
+  window.pid = p.id;
+  window.go('project');
 };
 
 window.askDelete = function(id) { window.deleteId = id; document.getElementById('covl').classList.add('open'); };
@@ -525,7 +529,7 @@ window.saveBest = async function() {
     }
     break;
   }
-  window.lagerData = d; await persist(); go(window.editing ? 'best' : 'project');
+  window.lagerData = d; await persist(); window.go(window.editing ? 'best' : 'project');
 };
 
 window.handlePdf = function(inp) {
