@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Lagerverwaltung MSW</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F0F4FF;color:#1a1a2e;max-width:500px;margin:0 auto;min-height:100vh}
+.page{display:none;min-height:100vh}.active{display:block}
+.hero{background:#6366f1;border-radius:20px;padding:18px;margin:12px 12px 4px;color:#fff}
+.hero h1{font-size:19px;font-weight:700;margin-bottom:2px}
+.hero p{font-size:12px;opacity:.8}
+.hrow{display:flex;justify-content:space-between;align-items:center}
+.scr{padding:0 12px 110px}
+.card{background:#fff;border-radius:14px;padding:13px 15px;margin-bottom:10px;box-shadow:0 2px 8px rgba(80,80,200,.08)}
+.tap{cursor:pointer}.tap:active{opacity:.7}
+.row{display:flex;justify-content:space-between;align-items:center}
+.chev{color:#c7d2fe;font-size:20px}
+.tag{display:inline-block;border-radius:20px;padding:3px 9px;font-size:11px;font-weight:600;margin:3px 2px 0 0}
+.tg{background:#F1F5F9;color:#64748B}.tr{background:#FEE2E2;color:#DC2626}
+.tgr{background:#DCFCE7;color:#16A34A}.tb{background:#DBEAFE;color:#2563EB}
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600;border:none;cursor:pointer;white-space:nowrap}
+.br{background:#FEE2E2;color:#DC2626}.bgr{background:#DCFCE7;color:#16A34A}.bb{background:#DBEAFE;color:#2563EB}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.dr{background:#DC2626}.dgr{background:#16A34A}.db{background:#2563EB}
+.pc{background:#fff;border-radius:13px;padding:12px 14px;margin-bottom:9px;box-shadow:0 2px 6px rgba(80,80,200,.06);border-left:4px solid #e2e8f0}
+.pcr{border-left-color:#DC2626}.pcg{border-left-color:#16A34A}.pcb{border-left-color:#2563EB}
+.fab{position:fixed;bottom:0;left:0;right:0;padding:10px 12px 28px;max-width:500px;margin:0 auto;background:linear-gradient(transparent,#F0F4FF 50%)}
+.btnp{width:100%;padding:14px;background:#6366f1;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer}
+.btng{width:100%;padding:10px;background:#fff;color:#6366f1;border:2px solid #c7d2fe;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;margin-top:7px}
+.btnsm{background:rgba(255,255,255,.25);border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;color:#fff}
+.back{background:none;border:none;color:#6366f1;font-size:13px;font-weight:600;cursor:pointer;padding:13px 15px 4px;display:flex;align-items:center;gap:4px}
+label{font-size:11px;color:#8892b0;font-weight:700;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+input{width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;background:#fff;color:#1a1a2e}
+input:focus{border-color:#6366f1}
+.field{margin-bottom:10px}
+.hdiv{border-top:1.5px solid #f1f5f9;margin:11px 0}
+.empty{text-align:center;padding:3rem 0;color:#a0aec0;font-size:14px;line-height:1.8}
+.ovl{display:none;position:fixed;inset:0;background:rgba(10,10,30,.5);z-index:100;align-items:flex-end;justify-content:center}
+.ovl.open{display:flex}
+.sheet{background:#fff;border-radius:20px 20px 0 0;padding:15px 15px 36px;width:100%;max-width:500px}
+.hdl{width:32px;height:4px;background:#e2e8f0;border-radius:2px;margin:0 auto 15px}
+.srow{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1.5px solid #f8fafc;cursor:pointer}
+.chbtn{margin-top:8px;width:100%;padding:8px;background:#F8F9FF;border:1.5px solid #e0e7ff;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;color:#6366f1}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g4{display:grid;grid-template-columns:40px 1fr 46px 40px;gap:5px;margin-top:8px}
+.del{background:none;border:none;color:#fca5a5;font-size:20px;cursor:pointer;padding:0;line-height:1}
+.sec{font-weight:700;font-size:13px;color:#6366f1;margin-bottom:9px}
+.sync{position:fixed;top:10px;right:14px;font-size:11px;color:#6366f1;background:#e0e7ff;border-radius:20px;padding:3px 10px;z-index:50}
+</style>
+</head>
+<body>
+
+<div id="sync-indicator" class="sync" style="display:none">Speichern...</div>
+
+<div id="pg-home" class="page active">
+  <div style="padding:12px 12px 0">
+    <div class="hero">
+      <div class="hrow">
+        <div><h1>Lagerverwaltung MSW</h1><p>Projekte und Bestellungen</p></div>
+        <button class="btnsm" onclick="go('inv')">Inventar</button>
+      </div>
+    </div>
+  </div>
+  <div style="padding:0 12px 8px">
+    <input id="search-input" placeholder="🔍 Bestellnummer suchen..." oninput="searchBest(this.value)" style="background:#fff;border:1.5px solid #e2e8f0;border-radius:12px;padding:11px 14px;font-size:14px;width:100%">
+  </div>
+  <div id="search-results" style="display:none;padding:0 12px"></div>
+  <div class="scr" id="home-list"></div>
+  <div class="fab"><button class="btnp" onclick="showProjForm()">+ Neues Projekt</button></div>
+</div>
+
+<div id="pg-project" class="page">
+  <button class="back" onclick="go('home')">&#8249; Projekte</button>
+  <div style="padding:0 12px 0"><div class="hero"><h1 id="ptitle"></h1><p id="psub"></p></div></div>
+  <div class="scr" id="proj-list"></div>
+  <div class="fab"><button class="btnp" onclick="openNewBest()">+ Neue Bestellung</button></div>
+</div>
+
+<div id="pg-best" class="page">
+  <button class="back" onclick="go('project')">&#8249; <span id="bpname"></span></button>
+  <div style="padding:0 12px 0">
+    <div class="hero">
+      <div class="hrow">
+        <div><h1 id="btitle"></h1><p id="bsub"></p></div>
+        <button class="btnsm" onclick="openEditBest()">Bearbeiten</button>
+      </div>
+    </div>
+  </div>
+  <div class="scr" id="best-list"></div>
+</div>
+
+<div id="pg-form" class="page">
+  <button class="back" id="fbk">&#8249; Zuruck</button>
+  <div style="padding:0 12px 0"><div class="hero"><h1 id="ftitle"></h1></div></div>
+  <div class="scr">
+    <div id="pdfsec" class="card" style="margin-bottom:10px">
+      <div class="sec">PDF importieren</div>
+      <input type="file" accept="application/pdf" id="pdfin" onchange="handlePdf(this)" style="border:none;padding:0;font-size:12px">
+      <div id="pdfmsg" style="font-size:12px;margin-top:5px;color:#8892b0"></div>
+    </div>
+    <div class="card">
+      <div class="field"><label>Bestellnummer</label><input id="fbn" placeholder="BE1002808"></div>
+      <div class="field"><label>Lieferant</label><input id="flf" placeholder="Paul Herkt GmbH"></div>
+      <div class="hdiv"></div>
+      <div class="sec">Positionen</div>
+      <div id="fpl"></div>
+      <div class="g4">
+        <input id="np0" placeholder="Pos" style="font-size:12px">
+        <input id="np1" placeholder="Bezeichnung" style="font-size:12px">
+        <input id="np2" type="number" value="1" min="1" style="font-size:12px">
+        <input id="np3" placeholder="Stk" style="font-size:12px">
+      </div>
+      <button class="btng" style="margin-top:9px" onclick="addPos()">+ Position hinzufugen</button>
+    </div>
+    <div style="margin-top:10px"><button class="btnp" id="sbtn" onclick="saveBest()">Speichern</button></div>
+  </div>
+</div>
+
+<div id="pg-inv" class="page">
+  <button class="back" onclick="go('home')">&#8249; Projekte</button>
+  <div style="padding:0 12px 0"><div class="hero"><h1>Lagerbestand</h1><p id="isub"></p></div></div>
+  <div class="scr">
+    <div id="iform" style="display:none;margin-bottom:10px">
+      <div class="card">
+        <div class="sec">Neuer Artikel</div>
+        <div class="g2" style="margin-bottom:8px">
+          <div class="field"><label>Name</label><input id="in0" placeholder="Keilriemen"></div>
+          <div class="field"><label>Ort</label><input id="in1" placeholder="Regal A3"></div>
+          <div class="field"><label>Menge</label><input id="in2" type="number" value="1" min="1"></div>
+          <div class="field"><label>Einheit</label><input id="in3" value="Stk"></div>
+        </div>
+        <div style="display:flex;gap:7px">
+          <button class="btng" style="width:auto;flex:1;margin:0;padding:9px" onclick="document.getElementById('iform').style.display='none'">Abbrechen</button>
+          <button class="btnp" style="flex:2;padding:9px;font-size:13px" onclick="saveInv()">Speichern</button>
+        </div>
+      </div>
+    </div>
+    <div id="ilist"></div>
+  </div>
+  <div class="fab"><button class="btnp" onclick="document.getElementById('iform').style.display='block';window.scrollTo(0,0)">+ Artikel hinzufugen</button></div>
+</div>
+
+<div class="ovl" id="sovl" onclick="closeSheet()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="hdl"></div>
+    <div id="sc"></div>
+  </div>
+</div>
+
+<div class="ovl" id="covl" onclick="cancelDelete()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="hdl"></div>
+    <div style="font-weight:700;font-size:16px;margin-bottom:6px">Projekt loschen?</div>
+    <div style="font-size:13px;color:#8892b0;margin-bottom:20px">Alle Bestellungen werden unwiederruflich geloscht.</div>
+    <div style="display:flex;gap:8px">
+      <button class="btng" style="flex:1;margin:0;padding:10px" onclick="cancelDelete()">Abbrechen</button>
+      <button class="btnp" style="flex:2;padding:10px;background:#DC2626" onclick="confirmDelete()">Ja, loschen</button>
+    </div>
+  </div>
+</div>
+
+<div class="ovl" id="novl" onclick="closeProjForm()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="hdl"></div>
+    <div class="sec">Neues Projekt</div>
+    <div class="field"><label>Projektname</label><input id="pname" placeholder="z.B. Umbau Munchen Sud"></div>
+    <button class="btnp" style="margin-top:4px" onclick="createProj()">Erstellen</button>
+    <button class="btng" onclick="closeProjForm()">Abbrechen</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+var firebaseConfig = {
+  apiKey: "AIzaSyDj6Xeqz5l-ln_LHmkwyVj3ZZwPOgxTPk4",
+  authDomain: "lager-stuttgart.firebaseapp.com",
+  projectId: "lager-stuttgart",
+  storageBucket: "lager-stuttgart.firebasestorage.app",
+  messagingSenderId: "1060328870436",
+  appId: "1:1060328870436:web:e2a6835494b6d6729a3eb1"
+};
+
+var fbApp = initializeApp(firebaseConfig);
+var db = getFirestore(fbApp);
+
+window.pid = null;
+window.bid = null;
+window.posid = null;
+window.fpos = [];
+window.editing = false;
+window.deleteId = null;
+window.lagerData = { projects: [], inventory: [] };
+
+function showSync() { document.getElementById('sync-indicator').style.display = 'block'; }
+function hideSync() { document.getElementById('sync-indicator').style.display = 'none'; }
+
+onSnapshot(doc(db, "lager", "main"), function(snap) {
+  if (snap.exists()) { window.lagerData = snap.data(); }
+  else { window.lagerData = { projects: [], inventory: [] }; }
+  var page = document.querySelector('.page.active');
+  if (page) {
+    var id = page.id;
+    if (id === 'pg-home') renderHome();
+    if (id === 'pg-project') renderProject();
+    if (id === 'pg-best') renderBest();
+    if (id === 'pg-inv') renderInv();
+  }
+});
+
+async function persist() {
+  showSync();
+  try { await setDoc(doc(db, "lager", "main"), window.lagerData); } catch(e) { console.error(e); }
+  hideSync();
+}
+
+function uid() { return Math.random().toString(36).slice(2,9); }
+
+window.go = function(page) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById('pg-' + page).classList.add('active');
+  window.scrollTo(0,0);
+  if (page === 'home') renderHome();
+  if (page === 'project') renderProject();
+  if (page === 'best') renderBest();
+  if (page === 'inv') renderInv();
+};
+
+function getProj() {
+  var ps = window.lagerData.projects || [];
+  for (var i = 0; i < ps.length; i++) { if (ps[i].id === window.pid) return ps[i]; }
+  return null;
+}
+function getBest() {
+  var p = getProj(); if (!p || !p.bestellungen) return null;
+  for (var i = 0; i < p.bestellungen.length; i++) { if (p.bestellungen[i].id === window.bid) return p.bestellungen[i]; }
+  return null;
+}
+
+window.searchBest = function(val) {
+  var res = document.getElementById('search-results');
+  var list = document.getElementById('home-list');
+  if (!val.trim()) { res.style.display = 'none'; list.style.display = 'block'; return; }
+  list.style.display = 'none'; res.style.display = 'block';
+  var ps = window.lagerData.projects || [];
+  var h = ''; var found = false;
+  for (var i = 0; i < ps.length; i++) {
+    var bl = ps[i].bestellungen || [];
+    for (var j = 0; j < bl.length; j++) {
+      if (bl[j].bestellnummer.toLowerCase().indexOf(val.toLowerCase()) !== -1) {
+        found = true;
+        var bid = bl[j].id; var pid = ps[i].id;
+        var pl = bl[j].positionen || []; var pend = 0; var entr = 0; var retr = 0;
+        for (var k = 0; k < pl.length; k++) {
+          if (pl[k].status === 'pendiente') pend++;
+          else if (pl[k].status === 'entregado') entr++;
+          else if (pl[k].status === 'retirado') retr++;
+        }
+        h += '<div class="card tap" onclick="openFromSearch(\'' + pid + '\',\'' + bid + '\')">';
+        h += '<div style="font-size:11px;color:#8892b0;margin-bottom:4px">' + ps[i].name + '</div>';
+        h += '<div class="row"><div>';
+        h += '<div style="font-weight:700;font-size:15px">' + bl[j].bestellnummer + '</div>';
+        h += '<div style="font-size:12px;color:#8892b0;margin-top:2px">' + bl[j].lieferant + '</div><div>';
+        if (pend) h += '<span class="tag tr">' + pend + ' ausstehend</span>';
+        if (entr) h += '<span class="tag tgr">' + entr + ' geliefert</span>';
+        if (retr) h += '<span class="tag tb">' + retr + ' entnommen</span>';
+        h += '</div></div><span class="chev">&#8250;</span></div></div>';
+      }
+    }
+  }
+  if (!found) h = '<div class="empty">Keine Bestellung gefunden.</div>';
+  res.innerHTML = h;
+};
+
+window.openFromSearch = function(projId, bestId) {
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-results').style.display = 'none';
+  document.getElementById('home-list').style.display = 'block';
+  window.pid = projId; window.bid = bestId; go('best');
+};
+
+function renderHome() {
+  var el = document.getElementById('home-list');
+  var ps = window.lagerData.projects || [];
+  if (!ps.length) { el.innerHTML = '<div class="empty">Noch keine Projekte.</div>'; return; }
+  var h = '';
+  for (var i = 0; i < ps.length; i++) {
+    var p = ps[i]; var pid = p.id;
+    var bl = p.bestellungen || []; var pend = 0; var entr = 0;
+    for (var j = 0; j < bl.length; j++) {
+      var pl = bl[j].positionen || [];
+      for (var k = 0; k < pl.length; k++) {
+        if (pl[k].status === 'pendiente') pend++;
+        if (pl[k].status === 'entregado') entr++;
+      }
+    }
+    h += '<div class="card"><div class="row">';
+    h += '<div style="flex:1;cursor:pointer" onclick="openProj(\'' + pid + '\')">';
+    h += '<div style="font-weight:700;font-size:16px">' + p.name + '</div><div>';
+    h += '<span class="tag tg">' + bl.length + ' Best.</span>';
+    if (pend) h += '<span class="tag tr">' + pend + ' ausstehend</span>';
+    if (entr) h += '<span class="tag tgr">' + entr + ' geliefert</span>';
+    h += '</div></div>';
+    h += '<div style="display:flex;align-items:center;gap:8px">';
+    h += '<span class="chev" style="cursor:pointer" onclick="openProj(\'' + pid + '\')">&#8250;</span>';
+    h += '<button onclick="askDelete(\'' + pid + '\')" style="background:#FEE2E2;border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;color:#DC2626">Loschen</button>';
+    h += '</div></div></div>';
+  }
+  el.innerHTML = h;
+}
+
+window.openProj = function(id) { window.pid = id; go('project'); };
+window.showProjForm = function() { document.getElementById('pname').value = ''; document.getElementById('novl').classList.add('open'); };
+window.closeProjForm = function() { document.getElementById('novl').classList.remove('open'); };
+window.createProj = async function() {
+  var name = document.getElementById('pname').value.trim(); if (!name) return;
+  var p = { id: uid(), name: name, bestellungen: [] };
+  var d = JSON.parse(JSON.stringify(window.lagerData));
+  if (!d.projects) d.projects = [];
+  d.projects.push(p); window.lagerData = d;
+  await persist(); window.closeProjForm(); window.pid = p.id; go('project');
+};
+
+window.askDelete = function(id) { window.deleteId = id; document.getElementById('covl').classList.add('open'); };
+window.cancelDelete = function() { window.deleteId = null; document.getElementById('covl').classList.remove('open'); };
+window.confirmDelete = async function() {
+  var id = window.deleteId;
+  var d = JSON.parse(JSON.stringify(window.lagerData));
+  d.projects = (d.projects||[]).filter(function(x) { return x.id !== id; });
+  window.lagerData = d; await persist(); window.cancelDelete(); renderHome();
+};
+
+function renderProject() {
+  var proj = getProj(); if (!proj) return;
+  document.getElementById('ptitle').textContent = proj.name;
+  var bl = proj.bestellungen || [];
+  document.getElementById('psub').textContent = bl.length + ' Bestellung(en)';
+  var el = document.getElementById('proj-list');
+  if (!bl.length) { el.innerHTML = '<div class="empty">Noch keine Bestellungen.</div>'; return; }
+  var h = '';
+  for (var i = 0; i < bl.length; i++) {
+    var b = bl[i]; var bid = b.id;
+    var pl = b.positionen || []; var pend = 0; var entr = 0; var retr = 0;
+    for (var j = 0; j < pl.length; j++) {
+      if (pl[j].status === 'pendiente') pend++;
+      else if (pl[j].status === 'entregado') entr++;
+      else if (pl[j].status === 'retirado') retr++;
+    }
+    h += '<div class="card tap" onclick="openBest(\'' + bid + '\')">';
+    h += '<div class="row"><div>';
+    h += '<div style="font-weight:700;font-size:15px">' + b.bestellnummer + '</div>';
+    h += '<div style="font-size:12px;color:#8892b0;margin-top:2px">' + b.lieferant + '</div><div>';
+    if (pend) h += '<span class="tag tr">' + pend + ' ausstehend</span>';
+    if (entr) h += '<span class="tag tgr">' + entr + ' geliefert</span>';
+    if (retr) h += '<span class="tag tb">' + retr + ' entnommen</span>';
+    h += '</div></div><span class="chev">&#8250;</span></div></div>';
+  }
+  el.innerHTML = h;
+}
+
+window.openBest = function(id) { window.bid = id; go('best'); };
+
+function renderBest() {
+  var b = getBest(); if (!b) return;
+  var proj = getProj();
+  document.getElementById('bpname').textContent = proj ? proj.name : '';
+  document.getElementById('btitle').textContent = b.bestellnummer;
+  document.getElementById('bsub').textContent = b.lieferant;
+  var el = document.getElementById('best-list');
+  var pl = b.positionen || [];
+  if (!pl.length) { el.innerHTML = '<div class="empty">Keine Positionen.</div>'; return; }
+  var h = '';
+  for (var i = 0; i < pl.length; i++) {
+    var pos = pl[i]; var posId = pos.id;
+    var pcls = pos.status === 'pendiente' ? 'pcr' : pos.status === 'entregado' ? 'pcg' : 'pcb';
+    var bcls = pos.status === 'pendiente' ? 'br' : pos.status === 'entregado' ? 'bgr' : 'bb';
+    var dcls = pos.status === 'pendiente' ? 'dr' : pos.status === 'entregado' ? 'dgr' : 'db';
+    var lbl = pos.status === 'pendiente' ? 'Ausstehend' : pos.status === 'entregado' ? 'Geliefert' : 'Entnommen';
+    var ret = pos.retiradoPor ? ' &middot; von <b>' + pos.retiradoPor + '</b>' : '';
+    h += '<div class="pc ' + pcls + '">';
+    h += '<div class="row"><div style="flex:1;margin-right:8px">';
+    h += '<div style="display:flex;gap:6px;align-items:center">';
+    h += '<span style="font-size:11px;color:#a0aec0;font-weight:600">POS ' + (pos.pos||i+1) + '</span>';
+    h += '<span style="font-weight:700;font-size:14px">' + pos.beschreibung + '</span></div>';
+    h += '<div style="font-size:12px;color:#8892b0;margin-top:4px">' + pos.menge + ' ' + pos.einheit + ret + '</div>';
+    h += '</div><button class="badge ' + bcls + '" onclick="openSheet(\'' + posId + '\')">';
+    h += '<span class="dot ' + dcls + '"></span>' + lbl + '</button></div>';
+    h += '<button class="chbtn" onclick="openSheet(\'' + posId + '\')">Status andern</button></div>';
+  }
+  el.innerHTML = h;
+}
+
+window.openSheet = function(id) {
+  window.posid = id;
+  var b = getBest(); if (!b) return;
+  var cur = '';
+  for (var i = 0; i < b.positionen.length; i++) { if (b.positionen[i].id === id) { cur = b.positionen[i].status; break; } }
+  renderStep1(cur);
+  document.getElementById('sovl').classList.add('open');
+};
+
+function renderStep1(cur) {
+  var h = '<div style="font-weight:700;font-size:16px;margin-bottom:12px">Status andern</div>';
+  h += '<div class="srow" onclick="setStatus(\'pendiente\',\'\')">';
+  h += '<button class="badge br" style="pointer-events:none"><span class="dot dr"></span>Ausstehend</button>';
+  h += cur === 'pendiente' ? '<span style="font-size:11px;color:#a0aec0">aktuell</span>' : '<span style="color:#c7d2fe;font-size:18px">&#8250;</span>';
+  h += '</div><div class="srow" onclick="setStatus(\'entregado\',\'\')">';
+  h += '<button class="badge bgr" style="pointer-events:none"><span class="dot dgr"></span>Geliefert</button>';
+  h += cur === 'entregado' ? '<span style="font-size:11px;color:#a0aec0">aktuell</span>' : '<span style="color:#c7d2fe;font-size:18px">&#8250;</span>';
+  h += '</div><div class="srow" onclick="renderRetStep()">';
+  h += '<button class="badge bb" style="pointer-events:none"><span class="dot db"></span>Entnommen</button>';
+  h += cur === 'retirado' ? '<span style="font-size:11px;color:#a0aec0">aktuell</span>' : '<span style="color:#c7d2fe;font-size:18px">&#8250;</span>';
+  h += '</div>';
+  document.getElementById('sc').innerHTML = h;
+}
+
+window.renderRetStep = function() {
+  var h = '<div style="font-weight:700;font-size:16px;margin-bottom:4px">Wer hat entnommen?</div>';
+  h += '<p style="font-size:12px;color:#8892b0;margin-bottom:10px">Name optional</p>';
+  h += '<input id="rname" placeholder="Name eingeben..." style="margin-bottom:12px">';
+  h += '<div style="display:flex;gap:8px">';
+  h += '<button class="btng" style="width:auto;flex:1;margin:0;padding:9px" onclick="renderStep1(\'\')">&#8249; Zuruck</button>';
+  h += '<button class="btnp" style="flex:2;padding:9px;font-size:13px" onclick="confRet()">Bestatigen</button></div>';
+  document.getElementById('sc').innerHTML = h;
+};
+
+window.confRet = function() { window.setStatus('retirado', document.getElementById('rname').value || ''); };
+window.closeSheet = function() { document.getElementById('sovl').classList.remove('open'); };
+
+window.setStatus = async function(status, name) {
+  var d = JSON.parse(JSON.stringify(window.lagerData));
+  var ps = d.projects || [];
+  for (var i = 0; i < ps.length; i++) {
+    if (ps[i].id !== window.pid) continue;
+    var bl = ps[i].bestellungen || [];
+    for (var j = 0; j < bl.length; j++) {
+      if (bl[j].id !== window.bid) continue;
+      var pl = bl[j].positionen || [];
+      for (var k = 0; k < pl.length; k++) {
+        if (pl[k].id === window.posid) {
+          pl[k].status = status;
+          pl[k].retiradoPor = status === 'retirado' ? name : '';
+          break;
+        }
+      }
+    }
+  }
+  window.lagerData = d; await persist(); window.closeSheet(); renderBest();
+};
+
+window.openNewBest = function() {
+  window.editing = false; window.fpos = [];
+  document.getElementById('fbn').value = '';
+  document.getElementById('flf').value = '';
+  document.getElementById('fpl').innerHTML = '';
+  document.getElementById('pdfsec').style.display = 'block';
+  document.getElementById('pdfmsg').textContent = '';
+  document.getElementById('pdfin').value = '';
+  document.getElementById('ftitle').textContent = 'Neue Bestellung';
+  document.getElementById('sbtn').textContent = 'Bestellung speichern';
+  document.getElementById('fbk').onclick = function() { go('project'); };
+  go('form');
+};
+
+window.openEditBest = function() {
+  var b = getBest(); if (!b) return;
+  window.editing = true; window.fpos = JSON.parse(JSON.stringify(b.positionen || []));
+  document.getElementById('fbn').value = b.bestellnummer;
+  document.getElementById('flf').value = b.lieferant;
+  document.getElementById('pdfsec').style.display = 'none';
+  document.getElementById('ftitle').textContent = 'Bestellung bearbeiten';
+  document.getElementById('sbtn').textContent = 'Anderungen speichern';
+  document.getElementById('fbk').onclick = function() { go('best'); };
+  renderFpos(); go('form');
+};
+
+function renderFpos() {
+  var h = '';
+  for (var i = 0; i < window.fpos.length; i++) {
+    var p = window.fpos[i];
+    h += '<div style="display:flex;align-items:center;gap:6px;padding:7px 0;border-bottom:1.5px solid #f1f5f9">';
+    h += '<span style="font-size:11px;color:#a0aec0;font-weight:600;min-width:20px">#' + (p.pos||i+1) + '</span>';
+    h += '<span style="flex:1;font-size:13px;font-weight:500">' + p.beschreibung + '</span>';
+    h += '<span style="font-size:12px;color:#8892b0">' + p.menge + ' ' + p.einheit + '</span>';
+    h += '<button class="del" onclick="removePos(\'' + p.id + '\')">&#215;</button></div>';
+  }
+  document.getElementById('fpl').innerHTML = h;
+}
+
+window.addPos = function() {
+  var desc = document.getElementById('np1').value.trim(); if (!desc) return;
+  window.fpos.push({ id: uid(), pos: document.getElementById('np0').value, beschreibung: desc, menge: parseInt(document.getElementById('np2').value)||1, einheit: document.getElementById('np3').value||'Stk', status: 'pendiente', retiradoPor: '' });
+  document.getElementById('np0').value = ''; document.getElementById('np1').value = '';
+  document.getElementById('np2').value = '1'; document.getElementById('np3').value = 'Stk';
+  renderFpos();
+};
+
+window.removePos = function(id) { window.fpos = window.fpos.filter(function(x) { return x.id !== id; }); renderFpos(); };
+
+window.saveBest = async function() {
+  var nr = document.getElementById('fbn').value.trim(); if (!nr) return;
+  var lf = document.getElementById('flf').value.trim();
+  var d = JSON.parse(JSON.stringify(window.lagerData));
+  var ps = d.projects || [];
+  for (var i = 0; i < ps.length; i++) {
+    if (ps[i].id !== window.pid) continue;
+    if (!ps[i].bestellungen) ps[i].bestellungen = [];
+    if (window.editing) {
+      for (var j = 0; j < ps[i].bestellungen.length; j++) {
+        if (ps[i].bestellungen[j].id === window.bid) {
+          ps[i].bestellungen[j].bestellnummer = nr;
+          ps[i].bestellungen[j].lieferant = lf;
+          ps[i].bestellungen[j].positionen = window.fpos;
+          break;
+        }
+      }
+    } else {
+      var nb = { id: uid(), bestellnummer: nr, lieferant: lf, positionen: window.fpos };
+      ps[i].bestellungen.push(nb); window.bid = nb.id;
+    }
+    break;
+  }
+  window.lagerData = d; await persist(); go(window.editing ? 'best' : 'project');
+};
+
+window.handlePdf = function(inp) {
+  var file = inp.files[0]; if (!file) return;
+  var msg = document.getElementById('pdfmsg');
+  msg.textContent = 'PDF wird gelesen...'; msg.style.color = '#8892b0';
+  var reader = new FileReader();
+  reader.onerror = function() { msg.textContent = 'Fehler.'; };
+  reader.onload = function() {
+    var b64 = reader.result.split(',')[1];
+    fetch('https://lager-proxy.gsperezpradella.workers.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: [
+          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } },
+          { type: 'text', text: 'Extract from this Auftragsbestaetigung. Return ONLY valid JSON no markdown: {"bestellnummer":"order number from Ihre Best. field","lieferant":"supplier name","positionen":[{"pos":"1","beschreibung":"article","menge":1,"einheit":"Stk"}]}' }
+        ]}]
+      })
+    }).then(function(r) { return r.json(); }).then(function(d) {
+      var t = null; var i;
+      for (i = 0; i < (d.content||[]).length; i++) { if (d.content[i].type === 'text') { t = d.content[i].text; break; } }
+      if (!t) { msg.textContent = 'Fehler.'; return; }
+      var parsed = JSON.parse(t.replace(/```json/g,'').replace(/```/g,'').trim());
+      document.getElementById('fbn').value = parsed.bestellnummer || '';
+      document.getElementById('flf').value = parsed.lieferant || '';
+      window.fpos = [];
+      var pl = parsed.positionen || [];
+      for (i = 0; i < pl.length; i++) {
+        window.fpos.push({ id: uid(), pos: String(pl[i].pos), beschreibung: pl[i].beschreibung, menge: pl[i].menge||1, einheit: pl[i].einheit||'Stk', status: 'pendiente', retiradoPor: '' });
+      }
+      renderFpos();
+      msg.textContent = '✓ PDF erfolgreich importiert'; msg.style.color = '#16A34A';
+    }).catch(function(e) { msg.textContent = 'Fehler: ' + e.message; });
+  };
+  reader.readAsDataURL(file);
+};
+
+function renderInv() {
+  document.getElementById('isub').textContent = (window.lagerData.inventory||[]).length + ' Artikel';
+  var el = document.getElementById('ilist');
+  var inv = window.lagerData.inventory || [];
+  if (!inv.length) { el.innerHTML = '<div class="empty">Lagerbestand leer.</div>'; return; }
+  var h = '';
+  for (var i = 0; i < inv.length; i++) {
+    var it = inv[i]; var iid = it.id;
+    h += '<div class="card"><div class="row"><div>';
+    h += '<div style="font-weight:700;font-size:15px">' + it.name + '</div>';
+    h += '<div style="font-size:12px;margin-top:3px"><span class="tag tg">' + it.menge + ' ' + it.einheit + '</span>';
+    if (it.ort) h += '<span class="tag tb">' + it.ort + '</span>';
+    h += '</div></div><button class="del" style="font-size:22px" onclick="delInv(\'' + iid + '\')">&#215;</button></div></div>';
+  }
+  el.innerHTML = h;
+}
+
+window.saveInv = async function() {
+  var name = document.getElementById('in0').value.trim(); if (!name) return;
+  var d = JSON.parse(JSON.stringify(window.lagerData));
+  if (!d.inventory) d.inventory = [];
+  d.inventory.push({ id: uid(), name: name, menge: parseInt(document.getElementById('in2').value)||1, einheit: document.getElementById('in3').value||'Stk', ort: document.getElementById('in1').value });
+  window.lagerData = d; await persist();
+  document.getElementById('in0').value = ''; document.getElementById('in1').value = '';
+  document.getElementById('in2').value = '1'; document.getElementById('in3').value = 'Stk';
+  document.getElementById('iform').style.display = 'none'; renderInv();
+};
+
+window.delInv = async function(id) {
+  var d = JSON.parse(JSON.stringify(window.lagerData));
+  d.inventory = (d.inventory||[]).filter(function(x) { return x.id !== id; });
+  window.lagerData = d; await persist(); renderInv();
+};
+
+renderHome();
+</script>
+</body>
+</html>
