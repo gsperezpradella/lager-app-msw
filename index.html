@@ -548,8 +548,7 @@ window.handlePdf = function(inp) {
         max_tokens: 1000,
         messages: [{ role: 'user', content: [
           { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } },
-          { type: 'text', text: 'Extract from this Auftragsbestaetigung. Return ONLY valid JSON no markdown: {"bestellnummer":"order number from Ihre Best. field","lieferant":"supplier name","positionen":[{"pos":"1","beschreibung":"article","menge":1,"einheit":"Stk"}]}' }
-        ]}]
+          { type: 'text', text: 'Extract from this order document. Return ONLY a JSON object, no text before or after, no markdown. For each position, use ONLY the product name (first line of description, before any technical details, specifications, or Bestellnr). Example: use "Makita DJN161RTJ Akku-Knabber 1,6 mm 18V" not the long description below it. Format: {"bestellnummer":"Vorgangsnummer value","lieferant":"supplier company name","positionen":[{"pos":"1","beschreibung":"product name only","menge":1,"einheit":"ST"}]}
       })
     }).then(function(r) { return r.json(); }).then(function(d) {
       var t = null; var i;
