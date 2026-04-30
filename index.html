@@ -18,7 +18,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .card{background:#fff;border-radius:14px;padding:13px 15px;margin-bottom:10px;box-shadow:0 2px 8px rgba(80,80,200,.08)}
 .tap{cursor:pointer}.tap:active{opacity:.7}
 .row{display:flex;justify-content:space-between;align-items:center}
-.chev{color:#c7d2fe;font-size:20px}
+.chev{color:#ffb480;font-size:20px}
 .tag{display:inline-block;border-radius:20px;padding:3px 9px;font-size:11px;font-weight:600;margin:3px 2px 0 0}
 .tg{background:#F1F5F9;color:#64748B}.tr{background:#FEE2E2;color:#DC2626}
 .tgr{background:#DCFCE7;color:#16A34A}.tb{background:#DBEAFE;color:#2563EB}
@@ -35,7 +35,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .back{background:none;border:none;color:#ea6c00;font-size:13px;font-weight:600;cursor:pointer;padding:13px 15px 4px;display:flex;align-items:center;gap:4px}
 label{font-size:11px;color:#8892b0;font-weight:700;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
 input{width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;background:#fff;color:#1a1a2e}
-input:focus{border-color:#6366f1}
+input:focus{border-color:#ea6c00}
 .field{margin-bottom:10px}
 .hdiv{border-top:1.5px solid #f1f5f9;margin:11px 0}
 .empty{text-align:center;padding:3rem 0;color:#a0aec0;font-size:14px;line-height:1.8}
@@ -44,12 +44,12 @@ input:focus{border-color:#6366f1}
 .sheet{background:#fff;border-radius:20px 20px 0 0;padding:15px 15px 36px;width:100%;max-width:500px}
 .hdl{width:32px;height:4px;background:#e2e8f0;border-radius:2px;margin:0 auto 15px}
 .srow{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1.5px solid #f8fafc;cursor:pointer}
-.chbtn{margin-top:8px;width:100%;padding:8px;background:#F8F9FF;border:1.5px solid #e0e7ff;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;color:#6366f1}
+.chbtn{margin-top:8px;width:100%;padding:8px;background:#FFF3E8;border:1.5px solid #ffb480;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;color:#ea6c00}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .g4{display:grid;grid-template-columns:40px 1fr 46px 40px;gap:5px;margin-top:8px}
 .del{background:none;border:none;color:#fca5a5;font-size:20px;cursor:pointer;padding:0;line-height:1}
-.sec{font-weight:700;font-size:13px;color:#6366f1;margin-bottom:9px}
-.sync{position:fixed;top:10px;right:14px;font-size:11px;color:#6366f1;background:#e0e7ff;border-radius:20px;padding:3px 10px;z-index:50}
+.sec{font-weight:700;font-size:13px;color:#ea6c00;margin-bottom:9px}
+.sync{position:fixed;top:10px;right:14px;font-size:11px;color:#ea6c00;background:#ffe4c4;border-radius:20px;padding:3px 10px;z-index:50}
 </style>
 </head>
 <body>
@@ -104,7 +104,7 @@ input:focus{border-color:#6366f1}
     </div>
     <div class="card">
       <div class="field"><label>Bestellnummer</label><input id="fbn" placeholder="BE1002808"></div>
-      <div class="field"><label>Lieferant</label><input id="flf" placeholder="Paul Herkt GmbH"></div>
+      <div class="field"><label>Lieferant</label><input id="flf" placeholder="Hermann Stitz"></div>
       <div class="hdiv"></div>
       <div class="sec">Positionen</div>
       <div id="fpl"></div>
@@ -158,7 +158,7 @@ input:focus{border-color:#6366f1}
     <div style="font-size:13px;color:#8892b0;margin-bottom:20px">Alle Bestellungen werden unwiederruflich geloscht.</div>
     <div style="display:flex;gap:8px">
       <button class="btng" style="flex:1;margin:0;padding:10px" onclick="cancelDelete()">Abbrechen</button>
-      <button class="btnp" style="flex:2;padding:10px;background:#DC2626" onclick="confirmDelete()">Ja, loschen</button>
+      <button class="btnp" style="flex:2;padding:10px;background:#DC2626;border-color:#DC2626" onclick="confirmDelete()">Ja, loschen</button>
     </div>
   </div>
 </div>
@@ -167,7 +167,7 @@ input:focus{border-color:#6366f1}
   <div class="sheet" onclick="event.stopPropagation()">
     <div class="hdl"></div>
     <div class="sec">Neues Projekt</div>
-    <div class="field"><label>Projektname</label><input id="pname" placeholder="z.B. Umbau Munchen Sud"></div>
+    <div class="field"><label>Projektname</label><input id="pname" placeholder="z.B. Umbau Frankfurt"></div>
     <button class="btnp" style="margin-top:4px" onclick="createProj()">Erstellen</button>
     <button class="btng" onclick="closeProjForm()">Abbrechen</button>
   </div>
@@ -196,13 +196,16 @@ window.fpos = [];
 window.editing = false;
 window.deleteId = null;
 window.lagerData = { projects: [], inventory: [] };
+window.dataLoaded = false;
 
 function showSync() { document.getElementById('sync-indicator').style.display = 'block'; }
 function hideSync() { document.getElementById('sync-indicator').style.display = 'none'; }
 
 onSnapshot(doc(db, "lager", "main"), function(snap) {
-  if (snap.exists()) { window.lagerData = snap.data(); }
-  else { window.lagerData = { projects: [], inventory: [] }; }
+  if (snap.exists()) {
+    window.lagerData = snap.data();
+    window.dataLoaded = true;
+  }
   var page = document.querySelector('.page.active');
   if (page) {
     var id = page.id;
@@ -214,6 +217,7 @@ onSnapshot(doc(db, "lager", "main"), function(snap) {
 });
 
 async function persist() {
+  if (!window.dataLoaded && (window.lagerData.projects||[]).length === 0) return;
   showSync();
   try { await setDoc(doc(db, "lager", "main"), window.lagerData); } catch(e) { console.error(e); }
   hideSync();
@@ -281,7 +285,7 @@ window.openFromSearch = function(projId, bestId) {
   document.getElementById('search-input').value = '';
   document.getElementById('search-results').style.display = 'none';
   document.getElementById('home-list').style.display = 'block';
-  window.pid = projId; window.bid = bestId; go('best');
+  window.pid = projId; window.bid = bestId; window.go('best');
 };
 
 function renderHome() {
@@ -314,20 +318,20 @@ function renderHome() {
   el.innerHTML = h;
 }
 
-window.openProj = function(id) { window.pid = id; go('project'); };
+window.openProj = function(id) { window.pid = id; window.go('project'); };
 window.showProjForm = function() { document.getElementById('pname').value = ''; document.getElementById('novl').classList.add('open'); };
 window.closeProjForm = function() { document.getElementById('novl').classList.remove('open'); };
+
 window.createProj = async function() {
   var name = document.getElementById('pname').value.trim(); if (!name) return;
   var p = { id: uid(), name: name, bestellungen: [] };
   var d = JSON.parse(JSON.stringify(window.lagerData));
   if (!d.projects) d.projects = [];
-  d.projects.push(p); window.lagerData = d;
+  d.projects.push(p); window.lagerData = d; window.dataLoaded = true;
   await persist();
   document.getElementById('novl').classList.remove('open');
   document.getElementById('pname').value = '';
-  window.pid = p.id;
-  window.go('project');
+  window.pid = p.id; window.go('project');
 };
 
 window.askDelete = function(id) { window.deleteId = id; document.getElementById('covl').classList.add('open'); };
@@ -367,7 +371,7 @@ function renderProject() {
   el.innerHTML = h;
 }
 
-window.openBest = function(id) { window.bid = id; go('best'); };
+window.openBest = function(id) { window.bid = id; window.go('best'); };
 
 function renderBest() {
   var b = getBest(); if (!b) return;
@@ -412,13 +416,13 @@ function renderStep1(cur) {
   var h = '<div style="font-weight:700;font-size:16px;margin-bottom:12px">Status andern</div>';
   h += '<div class="srow" onclick="setStatus(\'pendiente\',\'\')">';
   h += '<button class="badge br" style="pointer-events:none"><span class="dot dr"></span>Ausstehend</button>';
-  h += cur === 'pendiente' ? '<span style="font-size:11px;color:#a0aec0">aktuell</span>' : '<span style="color:#c7d2fe;font-size:18px">&#8250;</span>';
+  h += cur === 'pendiente' ? '<span style="font-size:11px;color:#a0aec0">aktuell</span>' : '<span style="color:#ffb480;font-size:18px">&#8250;</span>';
   h += '</div><div class="srow" onclick="setStatus(\'entregado\',\'\')">';
   h += '<button class="badge bgr" style="pointer-events:none"><span class="dot dgr"></span>Geliefert</button>';
-  h += cur === 'entregado' ? '<span style="font-size:11px;color:#a0aec0">aktuell</span>' : '<span style="color:#c7d2fe;font-size:18px">&#8250;</span>';
+  h += cur === 'entregado' ? '<span style="font-size:11px;color:#a0aec0">aktuell</span>' : '<span style="color:#ffb480;font-size:18px">&#8250;</span>';
   h += '</div><div class="srow" onclick="renderRetStep()">';
   h += '<button class="badge bb" style="pointer-events:none"><span class="dot db"></span>Entnommen</button>';
-  h += cur === 'retirado' ? '<span style="font-size:11px;color:#a0aec0">aktuell</span>' : '<span style="color:#c7d2fe;font-size:18px">&#8250;</span>';
+  h += cur === 'retirado' ? '<span style="font-size:11px;color:#a0aec0">aktuell</span>' : '<span style="color:#ffb480;font-size:18px">&#8250;</span>';
   h += '</div>';
   document.getElementById('sc').innerHTML = h;
 }
@@ -467,8 +471,8 @@ window.openNewBest = function() {
   document.getElementById('pdfin').value = '';
   document.getElementById('ftitle').textContent = 'Neue Bestellung';
   document.getElementById('sbtn').textContent = 'Bestellung speichern';
-  document.getElementById('fbk').onclick = function() { go('project'); };
-  go('form');
+  document.getElementById('fbk').onclick = function() { window.go('project'); };
+  window.go('form');
 };
 
 window.openEditBest = function() {
@@ -479,8 +483,8 @@ window.openEditBest = function() {
   document.getElementById('pdfsec').style.display = 'none';
   document.getElementById('ftitle').textContent = 'Bestellung bearbeiten';
   document.getElementById('sbtn').textContent = 'Anderungen speichern';
-  document.getElementById('fbk').onclick = function() { go('best'); };
-  renderFpos(); go('form');
+  document.getElementById('fbk').onclick = function() { window.go('best'); };
+  renderFpos(); window.go('form');
 };
 
 function renderFpos() {
@@ -545,16 +549,20 @@ window.handlePdf = function(inp) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1000,
+        max_tokens: 2000,
         messages: [{ role: 'user', content: [
           { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } },
-          { type: 'text', text: 'Extract from this order document. Return ONLY a JSON object, no text before or after, no markdown. For each position, use ONLY the product name (first line of description, before any technical details, specifications, or Bestellnr). Example: use "Makita DJN161RTJ Akku-Knabber 1,6 mm 18V" not the long description below it. Format: {"bestellnummer":"Vorgangsnummer value","lieferant":"supplier company name","positionen":[{"pos":"1","beschreibung":"product name only","menge":1,"einheit":"ST"}]}
+          { type: 'text', text: 'Extract from this order document. Return ONLY a JSON object, no text before or after, no markdown. For each position use ONLY the product name (first line of description before any technical details or Bestellnr). Format: {"bestellnummer":"Vorgangsnummer value","lieferant":"supplier company name","positionen":[{"pos":"1","beschreibung":"product name only","menge":1,"einheit":"ST"}]}' }
+        ]}]
       })
     }).then(function(r) { return r.json(); }).then(function(d) {
       var t = null; var i;
       for (i = 0; i < (d.content||[]).length; i++) { if (d.content[i].type === 'text') { t = d.content[i].text; break; } }
       if (!t) { msg.textContent = 'Fehler.'; return; }
-      var parsed = JSON.parse(t.replace(/```json/g,'').replace(/```/g,'').trim());
+      var clean = t.replace(/```json/g,'').replace(/```/g,'').trim();
+      var start = clean.indexOf('{'); var end = clean.lastIndexOf('}');
+      if (start !== -1 && end !== -1) clean = clean.slice(start, end+1);
+      var parsed = JSON.parse(clean);
       document.getElementById('fbn').value = parsed.bestellnummer || '';
       document.getElementById('flf').value = parsed.lieferant || '';
       window.fpos = [];
