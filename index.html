@@ -619,6 +619,11 @@ window.delInv = async function(id) {
 };
 
 renderHome();
+setTimeout(function() {
+  var s = document.getElementById('splash');
+  s.style.opacity = '0';
+  setTimeout(function() { s.style.display = 'none'; }, 400);
+}, 1500);
 </script>
 </body>
 </html>
